@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translate</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous"><body>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col">
+                <form class="row g-3 mb-5">
+                    <div class="col-auto">
+                        <select name="source" id="source" class="form-select" aria-describedby="sourceDes">
+                            <option selected disabled>Language...</option>
+                        </select>
+                        <label id="sourceDes" class="form-text">source</label>
+                    </div>
+                    <div class="col-4">
+                        <input type="text" id="input" class="form-control" placeholder="word...">
+                    </div>
+                    <div class="col-auto">
+                        <select name="target" id="target" class="form-select" aria-describedby="targetDes">
+                            <option selected disabled>Language...</option>
+                        </select>
+                        <label id="targetDes" class="form-text">target</label>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">TRANSLATE</button>
+                    </div>
+                </form>
+                <div class="row">
+                    <table class="table table-striped text-center">
+                        <thead>
+                          <tr>
+                            <th scope="col">WORD</th>
+                            <th scope="col">SOURCE</th>
+                            <th scope="col">TARGET</th>
+                            <th scope="col">TRANSLATED</th>
+                          </tr>
+                        </thead>
+                        <tbody id="translated">
+                    
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </div>
+            <div class="col pb-10">
+                <iframe src="https://datahub.io/core/language-codes/r/0.html" width="100%" height="500" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+    <script>
+        const socket = io();
+        socket.emit('languages')
+
+        socket.on('languages', function(message) {
+            for (const i of message) {
+                $('#source').append($('<option>').text(i.language).val(i.language));
+                $('#target').append($('<option>').text(i.language).val(i.language));
+            }
+        })
+
+        $('form').submit(function() {
+            const input = $('#input').val();
+            const source = $('#source').val();
+            const target = $('#target').val();
+            if (!source || !target || source == target) {
+                alert('language is invalid.');
+                return false;
+            }
+
+            if (!input) {
+                alert('word is empty.')
+                return false;
+            }
+
+            socket.emit('translate', `${source} ${input} ${target}`);
+            $('#input').val('');
+            return false; 
+        });
+
+        socket.on('translate', function(message) {
+            console.log(message);
+          $('#translated').append($('<tr>')
+                            .append($('<td>').text(message[0]))
+                                .append($('<td>').text(message[1]))
+                                    .append($('<td>').text(message[2]))
+                                        .append($('<td>').text(message[3]))) ;
+        });
+
+    </script>
+</body>
+</html>
