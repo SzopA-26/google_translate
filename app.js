@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
     res.render('index.html')
 })
 
-var languages = []
+let languages = []
 const req = unirest("GET", "https://google-translate1.p.rapidapi.com/language/translate/v2/languages");
 
 req.headers({
