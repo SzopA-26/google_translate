@@ -63,6 +63,7 @@
         socket.emit('languages')
 
         socket.on('languages', function(message) {
+            console.log(message);
             for (const i of message) {
                 $('#source').append($('<option>').text(i.language).val(i.language));
                 $('#target').append($('<option>').text(i.language).val(i.language));
