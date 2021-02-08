@@ -68,7 +68,8 @@ io.on('connection', (client) => {
             if (res.error) throw new Error(res.error)
 
             const translated = res.body.data.translations[0].translatedText
-            io.emit('translate', [input, source, target, translated])
+            const jsonStr = `{"source" : ${source}, "target" : ${target}, "input" : ${input}, "translated" : ${translated}}`
+            io.emit('translate', JSON.parse(jsonStr))
 
             console.log(client.handshake.address + ' TRANSLATE ' + source + ': ' + input + " --to-> " + target + ": " + translated);
         });
