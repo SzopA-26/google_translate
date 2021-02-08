@@ -82,8 +82,10 @@
                 alert('word is empty.')
                 return false;
             }
-
-            socket.emit('translate', `${source} ${input} ${target}`);
+            
+            
+            let data = `{"source" : "${source}", "target" : "${target}", "input" : "${input}"}`
+            socket.emit('translate',  JSON.parse(data));
             $('#input').val('');
             return false; 
         });
