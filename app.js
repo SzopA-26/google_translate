@@ -26,10 +26,10 @@ let languages = []
 const req = unirest("GET", "https://google-translate1.p.rapidapi.com/language/translate/v2/languages");
 
 req.headers({
-    "accept-encoding": "application/gzip",
-    "x-rapidapi-key": "78298e4a5dmsh216d2ec28596d9dp1a3ef9jsn740452b387c4",
-    "x-rapidapi-host": "google-translate1.p.rapidapi.com",
-    "useQueryString": true
+	"accept-encoding": "application/gzip",
+	"x-rapidapi-key": "3e9195c100msha72aca211054436p197714jsne2c2d74df22b",
+	"x-rapidapi-host": "google-translate1.p.rapidapi.com",
+	"useQueryString": true
 });
 
 req.end(function (res) {
@@ -54,7 +54,7 @@ io.on('connection', (client) => {
         req.headers({
             "content-type": "application/x-www-form-urlencoded",
             "accept-encoding": "application/gzip",
-            "x-rapidapi-key": "78298e4a5dmsh216d2ec28596d9dp1a3ef9jsn740452b387c4",
+            "x-rapidapi-key": "3e9195c100msha72aca211054436p197714jsne2c2d74df22b",
             "x-rapidapi-host": "google-translate1.p.rapidapi.com",
             "useQueryString": true
         });
