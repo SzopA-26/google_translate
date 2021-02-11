@@ -46,39 +46,53 @@ io.on('connection', (client) => {
         console.log('STATUS GET LANGUAGES')
         console.log(client.handshake.address + ' waited for input')
 
-        io.emit('languages',languages)
+        io.emit('languages', languages)
     })
 
     client.on('translate', (message) => {
-        var req = unirest("POST", "https://google-translate1.p.rapidapi.com/language/translate/v2");
+        
+        if (message.source == message.target || !message.source || !message.target) {
+            let err = "STATUS TRANSLATED ERROR 'cause source and target are the invalid."
+            console.log(err);
+            console.log(client.handshake.address + ' please check your input.')
+            io.emit("error", err)
 
-        req.headers({
-            "content-type": "application/x-www-form-urlencoded",
-            "accept-encoding": "application/gzip",
-            "x-rapidapi-key": "e14f70d3e6mshb99f8059d4aeb3cp1eef0ajsn047b196808b7",
-            "x-rapidapi-host": "google-translate1.p.rapidapi.com",
-            "useQueryString": true
-        });
+        } else if (message.input === "") {
+            let err = "STATUS TRANSLATED ERROR 'cause input is null"
+            console.log(err);
+            console.log(client.handshake.address + ' please check your input.')
+            io.emit("error", err)
 
-        req.form({
-            "q": message.input,
-            "source": message.source,
-            "target": message.target
-        });
+        } else {
+            let req = unirest("POST", "https://google-translate1.p.rapidapi.com/language/translate/v2");
 
-        req.end(function (res) {
-            if (res.error) throw new Error(res.error)
+            req.headers({
+                "content-type": "application/x-www-form-urlencoded",
+                "accept-encoding": "application/gzip",
+                "x-rapidapi-key": "e14f70d3e6mshb99f8059d4aeb3cp1eef0ajsn047b196808b7",
+                "x-rapidapi-host": "google-translate1.p.rapidapi.com",
+                "useQueryString": true
+            });
 
-            const translated = res.body.data.translations[0].translatedText
-            const jsonStr = `{"source" : "${ message.source}", "target" : "${message.target}", "input" : "${message.input}", "translated" : "${translated}"}`
-            io.emit('translate', JSON.parse(jsonStr))
+            req.form({
+                "q": message.input,
+                "source": message.source,
+                "target": message.target
+            });
 
-            console.log('STATUS TRANSLATED OK')
-            console.log(client.handshake.address + ' TRANSLATE ' + source + ': ' + input + " --to-> " + target + ": " + translated);
-            console.log('STATUS GET LANGUAGES')
-            console.log(client.handshake.address + ' waited for input')
-            
-        });
+            req.end(function (res) {
+                if (res.error) throw new Error(res.error)
+
+                const translated = res.body.data.translations[0].translatedText
+                const jsonStr = `{"source" : "${message.source}", "target" : "${message.target}", "input" : "${message.input}", "translated" : "${translated}"}`
+                io.emit('translate', JSON.parse(jsonStr))
+
+                console.log('STATUS TRANSLATED OK')
+                console.log(client.handshake.address + ' TRANSLATE ' + message.source + ': ' + message.input + " --to-> " + message.target + ": " + translated);
+                console.log(client.handshake.address + ' waited for input')
+            });
+
+        }
     })
 
 

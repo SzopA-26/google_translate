@@ -75,16 +75,6 @@
             const input = $('#input').val();
             const source = $('#source').val();
             const target = $('#target').val();
-            if (!source || !target || source == target) {
-                alert('language is invalid.');
-                return false;
-            }
-
-            if (!input) {
-                alert('word is empty.')
-                return false;
-            }
-            
             
             let data = `{"source" : "${source}", "target" : "${target}", "input" : "${input}"}`
             socket.emit('translate',  JSON.parse(data));
@@ -100,6 +90,11 @@
                                     .append($('<td>').text(message.target))
                                         .append($('<td>').text(message.translated))) ;
         });
+
+        socket.on('error', function(message) {
+            console.log(message);
+            alert(message)
+        })
 
     </script>
 </body>
