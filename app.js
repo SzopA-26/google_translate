@@ -1,13 +1,14 @@
 const express = require('express')
 const app = express()
 const path = require('path')
+// var app = require('express')();
 var unirest = require("unirest");
 
 const PORT = process.env.PORT || 9000
 
 const server = app.listen(PORT, () => {
     console.log(`App running on port ${PORT}`)
-    console.log('Hello from Server !! ')
+    console.log('go to http://localhost:9000 ')
 })
 
 const io = require('socket.io').listen(server)
@@ -27,7 +28,7 @@ const req = unirest("GET", "https://google-translate1.p.rapidapi.com/language/tr
 
 req.headers({
 	"accept-encoding": "application/gzip",
-	"x-rapidapi-key": "3e9195c100msha72aca211054436p197714jsne2c2d74df22b",
+	"x-rapidapi-key": "e14f70d3e6mshb99f8059d4aeb3cp1eef0ajsn047b196808b7",
 	"x-rapidapi-host": "google-translate1.p.rapidapi.com",
 	"useQueryString": true
 });
@@ -38,10 +39,12 @@ req.end(function (res) {
 });
 
 io.on('connection', (client) => {
+    console.log('STATUS CONNECTED OK')
     console.log(client.handshake.address + ' connected!')
     
     client.on('languages', () => {
-        console.log(client.handshake.address + ' GET languages')
+        console.log('STATUS GET LANGUAGES')
+        console.log(client.handshake.address + ' waited for input')
 
         io.emit('languages',languages)
     })
@@ -54,7 +57,7 @@ io.on('connection', (client) => {
         req.headers({
             "content-type": "application/x-www-form-urlencoded",
             "accept-encoding": "application/gzip",
-            "x-rapidapi-key": "3e9195c100msha72aca211054436p197714jsne2c2d74df22b",
+            "x-rapidapi-key": "e14f70d3e6mshb99f8059d4aeb3cp1eef0ajsn047b196808b7",
             "x-rapidapi-host": "google-translate1.p.rapidapi.com",
             "useQueryString": true
         });
@@ -71,11 +74,17 @@ io.on('connection', (client) => {
             const translated = res.body.data.translations[0].translatedText
             io.emit('translate', [input, source, target, translated])
 
+            console.log('STATUS TRANSLATED OK')
             console.log(client.handshake.address + ' TRANSLATE ' + source + ': ' + input + " --to-> " + target + ": " + translated);
+            console.log('STATUS GET LANGUAGES')
+            console.log(client.handshake.address + ' waited for input')
+            
         });
     })
 
+
     client.on('disconnect', function() {
+        console.log('STATUS DISCONNECTED OK')
         console.log(client.handshake.address + ' disconnected!');
     });
 })
