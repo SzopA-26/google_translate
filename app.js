@@ -20,7 +20,7 @@ app.set('view engine', 'html')
 app.use(express.static('public'))
 
 app.get('/', (req, res) => {
-    res.render('index.html')
+    res.status(200).render('index.html')
 })
 
 let languages = []
@@ -50,8 +50,6 @@ io.on('connection', (client) => {
     })
 
     client.on('translate', (message) => {
-        const [source, input, target] = message.split(' ')
-
         var req = unirest("POST", "https://google-translate1.p.rapidapi.com/language/translate/v2");
 
         req.headers({
@@ -63,16 +61,17 @@ io.on('connection', (client) => {
         });
 
         req.form({
-            "q": input,
-            "source": source,
-            "target": target
+            "q": message.input,
+            "source": message.source,
+            "target": message.target
         });
 
         req.end(function (res) {
             if (res.error) throw new Error(res.error)
 
             const translated = res.body.data.translations[0].translatedText
-            io.emit('translate', [input, source, target, translated])
+            const jsonStr = `{"source" : "${ message.source}", "target" : "${message.target}", "input" : "${message.input}", "translated" : "${translated}"}`
+            io.emit('translate', JSON.parse(jsonStr))
 
             console.log('STATUS TRANSLATED OK')
             console.log(client.handshake.address + ' TRANSLATE ' + source + ': ' + input + " --to-> " + target + ": " + translated);

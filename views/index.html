@@ -64,6 +64,7 @@
         socket.emit('languages')
 
         socket.on('languages', function(message) {
+            console.log(message);
             for (const i of message) {
                 $('#source').append($('<option>').text(i.language).val(i.language));
                 $('#target').append($('<option>').text(i.language).val(i.language));
@@ -83,8 +84,10 @@
                 alert('word is empty.')
                 return false;
             }
-
-            socket.emit('translate', `${source} ${input} ${target}`);
+            
+            
+            let data = `{"source" : "${source}", "target" : "${target}", "input" : "${input}"}`
+            socket.emit('translate',  JSON.parse(data));
             $('#input').val('');
             return false; 
         });
@@ -92,10 +95,10 @@
         socket.on('translate', function(message) {
             console.log(message);
           $('#translated').append($('<tr>')
-                            .append($('<td>').text(message[0]))
-                                .append($('<td>').text(message[1]))
-                                    .append($('<td>').text(message[2]))
-                                        .append($('<td>').text(message[3]))) ;
+                            .append($('<td>').text(message.input))
+                                .append($('<td>').text(message.source))
+                                    .append($('<td>').text(message.target))
+                                        .append($('<td>').text(message.translated))) ;
         });
 
     </script>
